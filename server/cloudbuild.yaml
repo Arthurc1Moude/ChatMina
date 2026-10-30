@@ -1,0 +1,40 @@
+substitutions:
+  _REGION: us-west1
+  _REPO: chatmina
+
+steps:
+  - id: 'build-image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/chatmina-api:latest'
+      - '.'
+
+  - id: 'push-image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/chatmina-api:latest'
+
+  - id: 'deploy-cloud-run'
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'chatmina-api'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/chatmina-api:latest'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--port=8080'
+      - '--memory=2Gi'
+      - '--cpu=1'
+      - '--timeout=120'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=MINA_FETCH_MODELS=1,MINA_LUNA_GCS=gs://$PROJECT_ID-minimodels/adapters/mina-luna,MINA_NUMBA_GCS=gs://$PROJECT_ID-minimodels/adapters/mina-numba'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/chatmina-api:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
