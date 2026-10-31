@@ -1,6 +1,7 @@
 """Loads the shared base model once and serves both LoRA adapters."""
 from threading import Lock, Thread
 
+from peft import PeftModel
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 
@@ -44,8 +45,20 @@ class ModelManager:
         self.model = AutoModelForCausalLM.from_pretrained(BASE_MODEL_NAME).to(DEVICE)
 
         # Attach both adapters to the single base model and switch per request.
-        self.model.load_adapter(ADAPTERS[MODEL_LUNA], adapter_name=MODEL_LUNA, local_files_only=True)
-        self.model.load_adapter(ADAPTERS[MODEL_NUMBA], adapter_name=MODEL_NUMBA, local_files_only=True)
+        self.model = PeftModel.from_pretrained(
+            self.model,
+            ADAPTERS[MODEL_LUNA],
+            adapter_name=MODEL_LUNA,
+            local_files_only=True,
+            is_trainable=False
+        )
+        self.model = PeftModel.from_pretrained(
+            self.model,
+            ADAPTERS[MODEL_NUMBA],
+            adapter_name=MODEL_NUMBA,
+            local_files_only=True,
+            is_trainable=False
+        )
         self.model.eval()
         self.loaded = True
 
