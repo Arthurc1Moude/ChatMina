@@ -32,6 +32,6 @@ MODEL_LUNA = "mina1-luna"
 MODEL_NUMBA = "mina1-numba"
 
 ADAPTERS = {
-    MODEL_LUNA: LUNA_ADAPTER_PATH,
-    MODEL_NUMBA: NUMBA_ADAPTER_PATH,
+    MODEL_LUNA: "/app/models/mina-luna",
+    MODEL_NUMBA: "/app/models/mina-numba",
 }

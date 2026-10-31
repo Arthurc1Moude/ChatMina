@@ -44,8 +44,8 @@ class ModelManager:
         self.model = AutoModelForCausalLM.from_pretrained(BASE_MODEL_NAME).to(DEVICE)
 
         # Attach both adapters to the single base model and switch per request.
-        self.model.load_adapter(ADAPTERS[MODEL_LUNA], adapter_name=MODEL_LUNA)
-        self.model.load_adapter(ADAPTERS[MODEL_NUMBA], adapter_name=MODEL_NUMBA)
+        self.model.load_adapter(ADAPTERS[MODEL_LUNA], adapter_name=MODEL_LUNA, local_files_only=True)
+        self.model.load_adapter(ADAPTERS[MODEL_NUMBA], adapter_name=MODEL_NUMBA, local_files_only=True)
         self.model.eval()
         self.loaded = True
 
